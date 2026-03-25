@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+apps/web/.next/
+apps/web/out/
+apps/api/bin/
+dist/
+tmp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Debug
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Sentry
+.sentryclirc
