@@ -2,6 +2,8 @@
 
 A RateYourMusic-inspired theatre logging and discovery platform for plays, musicals, and operas.
 
+The current app is a self-contained MVP: local app auth, work and production logging, discovery filters, user submissions, profile pages, and a basic admin review panel.
+
 ## Stack
 
 - **Frontend**: Next.js (TypeScript, Tailwind, shadcn/ui)
@@ -52,6 +54,10 @@ make migrate-up      # Run migrations against DATABASE_URL
 
 ```
 GET  /health
+POST /api/v1/auth/signup
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+GET  /api/v1/auth/me
 GET  /api/v1/works
 GET  /api/v1/works/:slug
 GET  /api/v1/productions
@@ -62,8 +68,11 @@ GET  /api/v1/discover
 GET  /api/v1/submissions
 POST /api/v1/submissions
 GET  /api/v1/admin/works
+POST /api/v1/admin/works
 GET  /api/v1/admin/productions
 GET  /api/v1/admin/submissions
+POST /api/v1/admin/submissions/:id/approve
+POST /api/v1/admin/submissions/:id/reject
 ```
 
 ## Frontend Routes
@@ -74,6 +83,12 @@ GET  /api/v1/admin/submissions
 /works/:slug             → Work page
 /productions/:id         → Production page
 /profile/:username       → User profile
+/admin                   → Basic admin panel
 /auth/login              → Login
 /auth/signup             → Sign up
 ```
+
+## MVP Notes
+
+- The first account created becomes an admin account so the submission review flow can be used immediately in local/dev environments.
+- User-submitted productions enter a pending queue and are turned into real productions when approved in `/admin`.

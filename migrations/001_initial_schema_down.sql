@@ -1,4 +1,7 @@
+DROP TABLE IF EXISTS production_submissions;
 DROP TABLE IF EXISTS logs;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS auth_accounts;
 DROP TABLE IF EXISTS production_credits;
 DROP TABLE IF EXISTS productions;
 DROP TABLE IF EXISTS venues;
@@ -9,6 +12,7 @@ DROP TABLE IF EXISTS works;
 DROP TABLE IF EXISTS genres;
 DROP TABLE IF EXISTS people;
 DROP TABLE IF EXISTS profiles;
+DROP TYPE IF EXISTS submission_status;
 DROP TYPE IF EXISTS credit_role;
 DROP TYPE IF EXISTS creator_role;
 DROP TYPE IF EXISTS work_type;

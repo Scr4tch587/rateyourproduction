@@ -2,6 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
+    credentials: "include",
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -13,3 +14,5 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   }
   return res.json();
 }
+
+export { API_URL };

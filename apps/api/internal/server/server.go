@@ -30,35 +30,51 @@ func (s *Server) Router() http.Handler {
 	r.Use(mw.Recoverer)
 	r.Use(mw.Timeout)
 
+	h := handler.New(s.db, s.rdb)
+
 	r.Get("/health", handler.Health)
 
 	r.Route("/api/v1", func(r chi.Router) {
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/signup", h.Signup)
+			r.Post("/login", h.Login)
+			r.Post("/logout", h.Logout)
+			r.Get("/me", h.Me)
+		})
+
 		r.Route("/works", func(r chi.Router) {
-			r.Get("/", handler.WorksList)
-			r.Get("/{slug}", handler.WorkGet)
+			r.Get("/", h.ListWorks)
+			r.Get("/{slug}", h.GetWork)
 		})
 
 		r.Route("/productions", func(r chi.Router) {
-			r.Get("/", handler.ProductionsList)
-			r.Get("/{id}", handler.ProductionGet)
+			r.Get("/", h.ListProductions)
+			r.Get("/{id}", h.GetProduction)
 		})
 
 		r.Route("/logs", func(r chi.Router) {
-			r.Get("/", handler.LogsList)
-			r.Post("/", handler.LogCreate)
+			r.Get("/", h.ListLogs)
+			r.Post("/", h.CreateLog)
 		})
 
-		r.Get("/discover", handler.Discover)
+		r.Get("/discover", h.Discover)
 
 		r.Route("/submissions", func(r chi.Router) {
-			r.Get("/", handler.SubmissionsList)
-			r.Post("/", handler.SubmissionCreate)
+			r.Get("/", h.ListSubmissions)
+			r.Post("/", h.CreateSubmission)
 		})
 
+		r.Get("/profile/{username}", h.GetProfile)
+
 		r.Route("/admin", func(r chi.Router) {
-			r.Get("/works", handler.AdminWorks)
-			r.Get("/productions", handler.AdminProductions)
-			r.Get("/submissions", handler.AdminSubmissions)
+			r.Get("/works", h.AdminListWorks)
+			r.Post("/works", h.AdminCreateWork)
+			r.Delete("/works/{id}", h.AdminDeleteWork)
+			r.Get("/productions", h.AdminListProductions)
+			r.Delete("/productions/{id}", h.AdminDeleteProduction)
+			r.Get("/submissions", h.AdminListSubmissions)
+			r.Post("/submissions/{id}/approve", h.AdminApproveSubmission)
+			r.Post("/submissions/{id}/reject", h.AdminRejectSubmission)
 		})
 	})
 

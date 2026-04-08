@@ -4,17 +4,41 @@
 CREATE TYPE work_type AS ENUM ('play', 'musical', 'opera');
 CREATE TYPE creator_role AS ENUM ('playwright', 'composer', 'lyricist', 'librettist', 'book_writer');
 CREATE TYPE credit_role AS ENUM ('actor', 'director', 'designer', 'choreographer', 'conductor', 'musician');
+CREATE TYPE submission_status AS ENUM ('pending', 'approved', 'rejected');
 
--- Users (extends Supabase auth.users)
+-- Profiles
 CREATE TABLE profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT UNIQUE NOT NULL,
     display_name TEXT,
     avatar_url TEXT,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE UNIQUE INDEX idx_profiles_username ON profiles (username);
+
+-- Local auth accounts
+CREATE TABLE auth_accounts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_auth_accounts_email ON auth_accounts (email);
+
+CREATE TABLE sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    token_hash TEXT UNIQUE NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_sessions_profile ON sessions (profile_id);
+CREATE INDEX idx_sessions_expires_at ON sessions (expires_at);
 
 -- People (creators, cast, crew)
 CREATE TABLE people (
@@ -152,3 +176,26 @@ CREATE INDEX idx_logs_user ON logs (user_id);
 CREATE INDEX idx_logs_work ON logs (work_id);
 CREATE INDEX idx_logs_production ON logs (production_id);
 CREATE INDEX idx_logs_created ON logs (created_at DESC);
+
+-- User-submitted productions
+CREATE TABLE production_submissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    work_id UUID NOT NULL REFERENCES works(id) ON DELETE CASCADE,
+    submitted_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    company_id UUID REFERENCES companies(id) ON DELETE SET NULL,
+    venue_id UUID REFERENCES venues(id) ON DELETE SET NULL,
+    city TEXT,
+    country TEXT,
+    start_date DATE,
+    end_date DATE,
+    production_label TEXT,
+    status submission_status NOT NULL DEFAULT 'pending',
+    notes TEXT,
+    reviewed_at TIMESTAMPTZ,
+    reviewer_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_production_submissions_work ON production_submissions (work_id);
+CREATE INDEX idx_production_submissions_submitted_by ON production_submissions (submitted_by);
+CREATE INDEX idx_production_submissions_status ON production_submissions (status);

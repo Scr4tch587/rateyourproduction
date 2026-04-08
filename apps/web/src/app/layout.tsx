@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Libre_Baskerville, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/auth-provider";
 import { Nav } from "@/components/nav";
+
+const baskerville = Libre_Baskerville({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +35,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${baskerville.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground text-sm">
-        <Nav />
-        <main className="flex-1">{children}</main>
+      <body className="min-h-full flex flex-col bg-background text-foreground text-sm font-sans">
+        <AuthProvider>
+          <Nav />
+          <main className="flex-1">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

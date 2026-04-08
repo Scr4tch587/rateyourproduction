@@ -8,8 +8,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +40,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-burgundy: var(--burgundy);
+  --color-burgundy-light: var(--burgundy-light);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,72 +52,40 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #f4f1e8;
+  --foreground: #1c1c1c;
+  --card: #eae4d3;
+  --card-foreground: #1c1c1c;
+  --popover: #eae4d3;
+  --popover-foreground: #1c1c1c;
+  --primary: #7a1f1f;
+  --primary-foreground: #f4f1e8;
+  --secondary: #eae4d3;
+  --secondary-foreground: #1c1c1c;
+  --muted: #e2dbc8;
+  --muted-foreground: #6b6356;
+  --accent: #7a1f1f;
+  --accent-foreground: #f4f1e8;
+  --destructive: #9a2020;
+  --border: #d4cbb5;
+  --input: #d4cbb5;
+  --ring: #7a1f1f;
+  --burgundy: #7a1f1f;
+  --burgundy-light: #9a3333;
+  --chart-1: #7a1f1f;
+  --chart-2: #2d4a3e;
+  --chart-3: #8b7355;
+  --chart-4: #4a3728;
+  --chart-5: #1c1c1c;
+  --radius: 0.25rem;
+  --sidebar: #eae4d3;
+  --sidebar-foreground: #1c1c1c;
+  --sidebar-primary: #7a1f1f;
+  --sidebar-primary-foreground: #f4f1e8;
+  --sidebar-accent: #e2dbc8;
+  --sidebar-accent-foreground: #1c1c1c;
+  --sidebar-border: #d4cbb5;
+  --sidebar-ring: #7a1f1f;
 }
 
 @layer base {
@@ -123,8 +94,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      linear-gradient(to bottom, rgba(122, 31, 31, 0.03), rgba(122, 31, 31, 0)),
+      radial-gradient(circle at top left, rgba(255,255,255,0.6), transparent 28%);
+    background-attachment: fixed;
   }
   html {
     @apply font-sans;
+  }
+  a {
+    @apply transition-colors;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-serif);
   }
 }
