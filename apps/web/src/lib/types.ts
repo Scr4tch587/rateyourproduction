@@ -116,18 +116,6 @@ export interface SessionProfile {
   is_admin: boolean;
 }
 
-export interface SignupRequest {
-  username: string;
-  email: string;
-  password: string;
-  display_name?: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
 export interface CreateLogRequest {
   work_id: string;
   production_id?: string;

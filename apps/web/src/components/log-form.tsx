@@ -16,7 +16,7 @@ interface LogFormProps {
 
 export function LogForm({ workId, productions, defaultProductionId }: LogFormProps) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const [productionId, setProductionId] = useState(defaultProductionId || "");
   const [seenDate, setSeenDate] = useState("");
   const [rating, setRating] = useState("4.0");
@@ -28,6 +28,10 @@ export function LogForm({ workId, productions, defaultProductionId }: LogFormPro
     e.preventDefault();
     if (!user) {
       setError("Log in to add a record.");
+      return;
+    }
+    if (!accessToken) {
+      setError("No Supabase session available.");
       return;
     }
 
@@ -45,6 +49,9 @@ export function LogForm({ workId, productions, defaultProductionId }: LogFormPro
       await apiFetch("/api/v1/logs", {
         method: "POST",
         body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       setReviewText("");
       router.refresh();

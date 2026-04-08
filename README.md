@@ -2,7 +2,7 @@
 
 A RateYourMusic-inspired theatre logging and discovery platform for plays, musicals, and operas.
 
-The current app is a self-contained MVP: local app auth, work and production logging, discovery filters, user submissions, profile pages, and a basic admin review panel.
+The current app is a Supabase-native MVP: Supabase Auth, Supabase Postgres, work and production logging, discovery filters, user submissions, profile pages, and a basic admin review panel.
 
 ## Stack
 
@@ -29,13 +29,15 @@ docs/            → Project documentation
 
 - Node.js 20+
 - Go 1.22+
-- Docker & Docker Compose
+- Docker
+- Supabase CLI
 
 ### Setup
 
 ```bash
 make setup           # Install dependencies, copy .env
-make dev             # Start Postgres + Redis via Docker
+supabase start       # Start local Supabase (Postgres + Auth)
+make dev             # Start Redis via Docker
 make dev-api         # Start Go API server (separate terminal)
 make dev-web         # Start Next.js dev server (separate terminal)
 ```
@@ -48,15 +50,13 @@ Copy `.env.example` to `.env` and fill in values. Each app also has its own `.en
 
 ```bash
 make migrate-up      # Run migrations against DATABASE_URL
+psql "$DATABASE_URL" -f migrations/002_seed_data.sql
 ```
 
 ## API Routes
 
 ```
 GET  /health
-POST /api/v1/auth/signup
-POST /api/v1/auth/login
-POST /api/v1/auth/logout
 GET  /api/v1/auth/me
 GET  /api/v1/works
 GET  /api/v1/works/:slug
@@ -90,5 +90,7 @@ POST /api/v1/admin/submissions/:id/reject
 
 ## MVP Notes
 
+- Signup/login/logout are handled directly by Supabase Auth in the frontend.
 - The first account created becomes an admin account so the submission review flow can be used immediately in local/dev environments.
 - User-submitted productions enter a pending queue and are turned into real productions when approved in `/admin`.
+- See [setup.md](/Users/scr4tch/Documents/Coding/Projects/rateyourproduction/setup.md) for the local Supabase workflow.

@@ -1,5 +1,7 @@
 -- RateYourProduction initial schema
--- Matches MVP spec data model
+-- Requires a Supabase/Postgres database with auth schema enabled.
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TYPE work_type AS ENUM ('play', 'musical', 'opera');
 CREATE TYPE creator_role AS ENUM ('playwright', 'composer', 'lyricist', 'librettist', 'book_writer');
@@ -8,7 +10,7 @@ CREATE TYPE submission_status AS ENUM ('pending', 'approved', 'rejected');
 
 -- Profiles
 CREATE TABLE profiles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     username TEXT UNIQUE NOT NULL,
     display_name TEXT,
     avatar_url TEXT,
@@ -18,27 +20,40 @@ CREATE TABLE profiles (
 
 CREATE UNIQUE INDEX idx_profiles_username ON profiles (username);
 
--- Local auth accounts
-CREATE TABLE auth_accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    generated_username TEXT;
+    first_user BOOLEAN;
+BEGIN
+    generated_username := COALESCE(
+        NULLIF(TRIM(NEW.raw_user_meta_data->>'username'), ''),
+        regexp_replace(split_part(COALESCE(NEW.email, ''), '@', 1), '[^a-zA-Z0-9_-]+', '-', 'g') || '-' || substring(NEW.id::text, 1, 8)
+    );
 
-CREATE UNIQUE INDEX idx_auth_accounts_email ON auth_accounts (email);
+    first_user := NOT EXISTS (SELECT 1 FROM public.profiles);
 
-CREATE TABLE sessions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    token_hash TEXT UNIQUE NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+    INSERT INTO public.profiles (id, username, display_name, avatar_url, is_admin)
+    VALUES (
+        NEW.id,
+        generated_username,
+        NULLIF(TRIM(NEW.raw_user_meta_data->>'display_name'), ''),
+        NULLIF(TRIM(NEW.raw_user_meta_data->>'avatar_url'), ''),
+        first_user
+    );
 
-CREATE INDEX idx_sessions_profile ON sessions (profile_id);
-CREATE INDEX idx_sessions_expires_at ON sessions (expires_at);
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_user();
 
 -- People (creators, cast, crew)
 CREATE TABLE people (

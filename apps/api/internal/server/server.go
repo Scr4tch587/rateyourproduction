@@ -30,15 +30,12 @@ func (s *Server) Router() http.Handler {
 	r.Use(mw.Recoverer)
 	r.Use(mw.Timeout)
 
-	h := handler.New(s.db, s.rdb)
+	h := handler.New(s.cfg, s.db, s.rdb)
 
 	r.Get("/health", handler.Health)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
-			r.Post("/signup", h.Signup)
-			r.Post("/login", h.Login)
-			r.Post("/logout", h.Logout)
 			r.Get("/me", h.Me)
 		})
 

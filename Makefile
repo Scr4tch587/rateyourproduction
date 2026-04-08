@@ -2,9 +2,9 @@
 
 # Local development
 dev:
-	@echo "Starting all services..."
+	@echo "Starting Redis..."
 	docker compose -f infra/docker-compose.yml up -d
-	@echo "Postgres running on :54322, Redis on :6379"
+	@echo "Redis running on :6379. Start Supabase separately with 'supabase start'."
 
 dev-web:
 	cd apps/web && npm run dev

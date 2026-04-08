@@ -1,7 +1,5 @@
 DROP TABLE IF EXISTS production_submissions;
 DROP TABLE IF EXISTS logs;
-DROP TABLE IF EXISTS sessions;
-DROP TABLE IF EXISTS auth_accounts;
 DROP TABLE IF EXISTS production_credits;
 DROP TABLE IF EXISTS productions;
 DROP TABLE IF EXISTS venues;
@@ -12,6 +10,8 @@ DROP TABLE IF EXISTS works;
 DROP TABLE IF EXISTS genres;
 DROP TABLE IF EXISTS people;
 DROP TABLE IF EXISTS profiles;
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
 DROP TYPE IF EXISTS submission_status;
 DROP TYPE IF EXISTS credit_role;
 DROP TYPE IF EXISTS creator_role;

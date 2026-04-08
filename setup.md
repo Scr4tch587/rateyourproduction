@@ -1,173 +1,138 @@
-You are setting up the initial foundation for a new full-stack project in an EMPTY repo.
+# Local Setup
 
-I will also provide you with the MVP spec separately. That spec is the source of truth. Follow it strictly. Do not add features beyond the spec unless they are necessary scaffolding.
+This project now uses Supabase natively for:
 
-Your job in this pass is NOT to build the full product. Your job is to create a clean, production-minded initial setup that makes the project easy to build on.
+- Postgres
+- Auth (`auth.users`)
+- profile provisioning from auth metadata
 
-Project context:
-- Project name: RateYourProduction
-- Product: a RateYourMusic-inspired theatre logging/discovery platform for plays, musicals, and operas
-- Frontend: Next.js
-- Backend: Go
-- Database/Auth/Storage: Supabase
-- Cache/queue: Redis
-- Backend hosting: Railway
-- Frontend hosting: Vercel
-- Observability: Sentry
-- UI direction: dense, information-first, dark-first, clearly inspired by RYM but modernized
+Redis is still local via Docker.
 
-Your goals for this setup:
-1. Create a monorepo structure that is simple, clean, and easy to extend
-2. Set up the frontend app
-3. Set up the Go backend app
-4. Set up shared project conventions and documentation
-5. Set up local development infrastructure
-6. Set up the minimum schema/migrations/models needed to begin implementing the MVP
-7. Do not overengineer
+## Prerequisites
 
-Important constraints:
-- Prioritize speed, clarity, and clean foundations over completeness
-- Make decisions that are resume-legible and production-plausible
-- Avoid unnecessary abstractions
-- Avoid placeholder complexity
-- Prefer boring, standard tools
-- Do not implement product features unless they are necessary to validate the setup
-- If something from the spec is better deferred, scaffold for it rather than fully implementing it
+- Node.js 20+
+- Go 1.22+
+- Docker
+- Supabase CLI
 
-What I want you to produce:
+Install the Supabase CLI if needed:
 
-1. Repo structure
-Create a monorepo with a structure similar to:
-- apps/web
-- apps/api
-- apps/worker if needed, but only if justified
-- packages/shared only if clearly useful
-- infra
-- docs
+```bash
+brew install supabase/tap/supabase
+```
 
-If you think a slightly different structure is better, explain why briefly and use it.
+## 1. Copy Environment Files
 
-2. Frontend setup
-In apps/web:
-- initialize a Next.js app with TypeScript
-- configure Tailwind
-- configure shadcn/ui if appropriate
-- set up a dark-first global theme foundation
-- create a minimal app shell/layout
-- create placeholder routes/pages for the MVP’s major surfaces:
-  - home
-  - discover
-  - work page route
-  - production page route
-  - profile page route
-  - auth area if needed
-- create a minimal, dense, RYM-inspired UI foundation
-- do NOT spend time polishing visuals beyond a solid base
+```bash
+cp .env.example .env
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+```
 
-3. Backend setup
-In apps/api:
-- initialize a Go service
-- choose a lightweight, standard HTTP framework or router
-- set up a clean folder structure
-- include:
-  - config loading
-  - server startup
-  - health route
-  - versioned API routing
-  - database connection setup
-  - Redis connection setup scaffold
-  - basic middleware setup
-  - graceful shutdown
-- structure the code so it will support:
-  - works
-  - productions
-  - logs
-  - discovery
-  - submissions
-  - admin
-- but do not fully implement these yet
+For local Supabase, the defaults already point at the standard local ports:
 
-4. Database and schema foundation
-Using the MVP spec as source of truth:
-- define the initial relational schema needed for MVP
-- create migrations
-- include the core entities and relationships
-- include sensible indexes
-- include enums/constants where appropriate
-- include enough structure for:
-  - works
-  - productions
-  - users/profiles as needed
-  - genres
-  - people
-  - credits
-  - logs
-  - companies
-  - venues
-- if there are parts of the final schema that are too speculative for initial setup, note that and choose the most stable foundation
+- Supabase API: `http://127.0.0.1:54321`
+- Postgres: `postgresql://postgres:postgres@localhost:54322/postgres`
+- Redis: `redis://localhost:6379`
+- API: `http://localhost:8080`
 
-5. Supabase integration foundation
-- assume Supabase for Postgres/Auth/Storage
-- wire environment/config expectations clearly
-- do not build full auth flows yet unless they are very lightweight
-- make sure the project is clearly ready for Supabase-backed auth and DB usage
+## 2. Install App Dependencies
 
-6. Redis foundation
-- set up Redis connection/config scaffolding
-- if background jobs are not needed on day 1, still prepare a clean place for them
-- do not build queue logic yet unless it is minimal and justified
+```bash
+make setup
+```
 
-7. Sentry foundation
-- add Sentry scaffolding for both frontend and backend if reasonable
-- if full setup is too much for initial pass, at least prepare the config hooks and env expectations
+## 3. Start Supabase
 
-8. Developer experience
-Set up:
-- root README with setup instructions
-- per-app README if helpful
-- .env.example files
-- Makefile or equivalent commands if useful
-- basic lint/format setup
-- scripts for local dev
-- Docker Compose for local dependencies if appropriate
-- clear instructions for running the project locally
+From the repo root:
 
-9. API foundation
-Create an initial REST API structure with placeholder routes for:
-- /health
-- /api/v1/works
-- /api/v1/productions
-- /api/v1/logs
-- /api/v1/discover
-- /api/v1/submissions
-- /api/v1/admin
+```bash
+supabase start
+```
 
-Do not implement business logic beyond what is necessary to validate the plumbing.
+This starts the local Supabase stack, including Postgres and Auth.
 
-10. Output expectations
-I want:
-- the actual files created
-- a brief explanation of the architecture decisions
-- a list of what was intentionally left unimplemented
-- a list of the next 5 highest-leverage implementation steps
+## 4. Start Redis
 
-Engineering preferences:
-- Keep the setup clean and practical
-- Optimize for real deployment later on Vercel + Railway + Supabase
-- Keep the Go service idiomatic and easy to grow
-- Keep the frontend easy to iterate on quickly
-- Keep naming consistent with the MVP spec
-- Avoid comments unless they are genuinely useful
-- Avoid adding tests unless they are setup-level smoke tests that meaningfully help
+```bash
+make dev
+```
 
-Decision guidance:
-- When uncertain, prefer the simpler option
-- When uncertain, align to the MVP spec
-- When uncertain, choose the option that helps me ship faster while still sounding credible in interviews
+## 5. Apply Schema and Seed Data
 
-Important:
-- This is an EMPTY repo
-- I want an initial setup only
-- Do not build the entire product
-- Do not invent scope outside the MVP spec
-- Make the repo feel like a serious project from day 1
+```bash
+export DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
+psql "$DATABASE_URL" -f migrations/001_initial_schema.sql
+psql "$DATABASE_URL" -f migrations/002_seed_data.sql
+```
+
+The schema expects the Supabase `auth` schema to exist. Use Supabase Postgres, not plain standalone Postgres.
+
+## 6. Run the API
+
+```bash
+make dev-api
+```
+
+The API uses:
+
+- direct Postgres access for application data
+- Supabase Auth `/auth/v1/user` for bearer-token verification
+
+## 7. Run the Web App
+
+In another terminal:
+
+```bash
+make dev-web
+```
+
+## 8. Create Your First User
+
+Open:
+
+- Web app: `http://localhost:3000`
+- Auth signup: `http://localhost:3000/auth/signup`
+
+Sign up with:
+
+- username
+- email
+- password
+
+The signup flow now goes directly through Supabase Auth. A database trigger creates the corresponding row in `public.profiles`.
+
+The first signed-up user becomes `is_admin = true`.
+
+## 9. Test the Core Flows
+
+After signing in, verify:
+
+1. `/discover` loads and filters.
+2. A work page lets you add a log.
+3. A work page lets you submit a missing production.
+4. `/profile/<username>` shows your logs.
+5. `/admin` loads for the first user and can approve submissions.
+
+## Useful Supabase Commands
+
+Stop local Supabase:
+
+```bash
+supabase stop
+```
+
+Reset local Supabase database:
+
+```bash
+supabase db reset
+```
+
+If you use `supabase db reset`, reapply any repo-specific seed/migration steps if needed.
+
+## Notes
+
+- The frontend auth state is managed by `@supabase/supabase-js`.
+- Protected API requests send Supabase access tokens as `Authorization: Bearer <token>`.
+- The Go API does not own passwords or sessions anymore.
+- `infra/docker-compose.yml` now exists only for Redis.

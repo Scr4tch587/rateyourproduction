@@ -13,7 +13,7 @@ import type {
 } from "@/lib/types";
 
 export function AdminPanel() {
-  const { user, loading } = useAuth();
+  const { user, accessToken, loading } = useAuth();
   const [works, setWorks] = useState<WorkCard[]>([]);
   const [submissions, setSubmissions] = useState<ProductionSubmission[]>([]);
   const [title, setTitle] = useState("");
@@ -21,17 +21,28 @@ export function AdminPanel() {
   const [message, setMessage] = useState("");
 
   const loadData = useCallback(async () => {
+    if (!accessToken) {
+      return;
+    }
     try {
       const [worksRes, submissionsRes] = await Promise.all([
-        apiFetch<PaginatedResponse<WorkCard>>("/api/v1/admin/works?per_page=20"),
-        apiFetch<PaginatedResponse<ProductionSubmission>>("/api/v1/admin/submissions?status=pending"),
+        apiFetch<PaginatedResponse<WorkCard>>("/api/v1/admin/works?per_page=20", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }),
+        apiFetch<PaginatedResponse<ProductionSubmission>>("/api/v1/admin/submissions?status=pending", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }),
       ]);
       setWorks(worksRes.data);
       setSubmissions(submissionsRes.data);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Failed to load admin data");
     }
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     if (user?.is_admin) {
@@ -45,10 +56,17 @@ export function AdminPanel() {
   async function createWork(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("");
+    if (!accessToken) {
+      setMessage("No Supabase session available.");
+      return;
+    }
     try {
       await apiFetch("/api/v1/admin/works", {
         method: "POST",
         body: JSON.stringify({ title, type }),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       setTitle("");
       setMessage("Work created.");
@@ -59,9 +77,16 @@ export function AdminPanel() {
   }
 
   async function reviewSubmission(id: string, action: "approve" | "reject") {
+    if (!accessToken) {
+      setMessage("No Supabase session available.");
+      return;
+    }
     await apiFetch(`/api/v1/admin/submissions/${id}/${action}`, {
       method: "POST",
       body: JSON.stringify({}),
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     loadData();
   }

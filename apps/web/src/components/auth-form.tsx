@@ -32,7 +32,11 @@ export function AuthForm({ mode }: AuthFormProps) {
           password,
           display_name: displayName || undefined,
         });
-        router.push(`/profile/${user.username}`);
+        if (user) {
+          router.push(`/profile/${user.username}`);
+        } else {
+          router.push("/auth/login");
+        }
       } else {
         const user = await login({ email, password });
         router.push(`/profile/${user.username}`);

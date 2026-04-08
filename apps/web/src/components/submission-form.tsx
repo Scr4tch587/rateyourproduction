@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function SubmissionForm({ workId }: { workId: string }) {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const [productionLabel, setProductionLabel] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
@@ -21,6 +21,10 @@ export function SubmissionForm({ workId }: { workId: string }) {
     e.preventDefault();
     if (!user) {
       setMessage("Log in to submit a production.");
+      return;
+    }
+    if (!accessToken) {
+      setMessage("No Supabase session available.");
       return;
     }
     setSubmitting(true);
@@ -37,6 +41,9 @@ export function SubmissionForm({ workId }: { workId: string }) {
       await apiFetch("/api/v1/submissions", {
         method: "POST",
         body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       setProductionLabel("");
       setCity("");
